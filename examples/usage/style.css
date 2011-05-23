@@ -1,0 +1,6 @@
+body { }
+
+ul li { border-bottom:1px solid #606060; min-height:80px; }
+ul li cite { background:#eee; padding:5px;  }
+ul li p.result { background:#fadfff; padding:5px; }
+ul li p.result dl dd { text-indent:10px; }

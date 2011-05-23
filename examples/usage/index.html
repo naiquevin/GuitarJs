@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Insert title here</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+    <script type="text/javascript" src="../../src/guitar.js"></script>
+    <script type="text/javascript" src="../../src/jquery.js"></script>
+  </head>
+  <body>
+
+    <h1>GuitarJS Code Examples</h1>
+
+    <ul>
+      <li>
+        <h3>Build a chord</h3>
+        <cite>Chord.build("A Maj")</cite>
+        <a class="try" href="javascript:void(0);">Try</a>
+        <a class="toggle" href="javascript:void(0);">Toggle Result</a>
+        <br />
+        <p class="result"></p>
+      </li>
+      <li>
+        <h3>Get the entire fretboard map (Applies to 6 string 24 fret std. tuned guitar.)</h3>
+        <cite>Guitar.Fretboard.fretMap</cite>
+        <a class="try" href="javascript:void(0);">Try</a>
+        <a class="toggle" href="javascript:void(0);">Toggle Result</a>
+        <br />
+        <p class="result"></p>
+      </li>
+      <li>
+        <h3>Find all occurences of a note</h3>
+        <cite>Guitar.Fretboard.findOccurrences("A")</cite>
+        <a class="try" href="javascript:void(0);">Try</a>
+        <a class="toggle" href="javascript:void(0);">Toggle Result</a>
+        <br />
+        <p class="result"></p>
+      </li>
+      <li>
+        <h3>All the chord shapes on a guitar fretboard.</h3>
+        <cite>var ch = Guitar.Fretboard.create("F# Min")</cite>
+        <a id="try-chord" href="javascript:void(0);">Try</a>
+        <a id="next-shape" href="javascript:void(0);">Next Shape</a>
+        <br />
+        <p class="result"></p>
+      </li>
+</ul>
+
+<script type="text/javascript">
+
+$(document).ready(function () {
+    $("ul>li>a.try").click(function () {
+        var $siblings = $(this).siblings(),
+        $cite = $siblings.filter("cite"),
+        $result_area = $siblings.filter("p.result");        
+        if ($result_area.children().filter("dl").length > 0) {
+            $result_area.show();
+            return false;
+        }
+        result = eval($cite.text());
+        var html = show_object(result);
+        $result_area.html(html);
+    });
+
+    $("ul>li>a.toggle").click(function () {
+        $(this).siblings().filter("p.result").toggle();
+    });
+
+    function show_object(obj) {
+        var html = '<dl>';
+        for (var i in obj) {            
+            html += '<dt>'+i+':</dt>';
+            html += '<dd>'+obj[i]+'</dd>';            
+        }
+        html += '</dl>';        
+        return html;
+    }
+
+    (function () {
+        var ch = Guitar.Chord.create("F# Min");
+        var cs = ch.next();
+        var html = show_object(cs);
+
+        $("#try-chord").click(function () {
+            $(this).siblings().filter("p").html(html);
+        });
+
+        $("#next-shape").click(function () {            
+            if (ch.has_next()) {
+                cs = ch.next();
+                html = show_object(cs);
+                $("#try-chord").trigger('click');
+            } else {
+                alert('no next shape');
+            }
+        });
+    }) ();    
+});
+
+
+</script>
+
+
+</body>
+</html>
