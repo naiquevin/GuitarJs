@@ -70,4 +70,34 @@ $(document).ready(function () {
         equals(scale.notes[0], "F", 'first note is root');
         equals(scale.toString(), 'F^G^A^A#^C^D^E');
     });
+
+    module("Guitar Fretboard");
+
+    test("fretboard occurences", function () {
+        var occ = Guitar.Fretboard.findOccurrences("C");
+        equals(occ[0], null, 'there is no zeroth string');
+        equals(occ[1][0], 8, 'C - 1st string 8th fret');
+        equals(occ[6][0], 8, 'C - Also 6th string 8th fret');
+        equals(occ[5][0], 3, 'C - 3rd fret on the 5th string');
+        var total_c = 0;
+        for (var i = 1; i <= 6; i++) {
+            total_c += occ[i].length;
+        }
+        equals(total_c, 12, 'C - total 12 occurences on a 24 fret guitar');
+        var total_e = 0;
+        var occ = Guitar.Fretboard.findOccurrences("E");
+        for (var i = 1; i <= 6; i++) {
+            total_e += occ[i].length;
+        }
+        equals(total_e, 14, 'E - on the otherhand has all 14 occurences due to 2 open strings');
+        var total = 0,
+        all_notes = Notes.names;
+        for (var j in all_notes) {
+            var occ = Guitar.Fretboard.findOccurrences(all_notes[j]);
+            for (var k = 1; k <= 6; k++) {
+                total += occ[k].length;
+            }
+        }
+        equals(total, 24*6+6, 'occurences of all notes add upto 24*6 frets + 6 open notes');
+    });
 });
