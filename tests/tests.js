@@ -1,20 +1,5 @@
 $(document).ready(function () {
 
-    // test('Fretboard._find_in_proximity', function () {
-    //     var root = { note : "A", pos : [5,0]};
-    //     var range = [0, 4];
-    //     var result = Fretboard._find_in_proximity(root, "A", range);
-    //     same({ 3 : 2 }, result, 'testing with range [0, 4]');
-    //     var root = { note : "A", pos : [6,5]};
-    //     var range = [-2, 2];
-    //     var result = Fretboard._find_in_proximity(root, "A", range);
-    //     same({ 4: 7, 1: 5 }, result, 'testing for range [-2, 2]');
-    //     var root = { note : "A", pos : [5,0]};
-    //     var range = [-4, 0];
-    //     var result = Fretboard._find_in_proximity(root, "A", range);
-    //     same({  }, result, 'testing for range [-4, 0] starting on open root');
-    // });
-
     module("Notes");
 
     test('Names', function () {
@@ -43,6 +28,12 @@ $(document).ready(function () {
         equals(Notes._flatten("E"), "D#");
         equals(Notes._flatten("G#"), "G");
         equals(Notes._flatten("F"), "E");
+    });
+
+    test('Slugify a note', function() {
+        equals(Notes.slugify("C#"), "c-sharp");
+        equals(Notes.slugify("F"), "f");
+        raises(Notes.slugify, Error, "Invalid Note B#");               
     });
 
     module("Chord");

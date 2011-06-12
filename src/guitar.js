@@ -14,8 +14,20 @@
  *  [Notes, Chord, ScaleFactory, Guitar]
  */
 (function () {
+    
+    /**
+     * First some general helper functions
+     */
+    function inArray (needle, hay) {
+	for(var i = 0; i < hay.length; i++) {
+	    if(needle === hay[i]){
+		return true;
+	    }
+	}
+	return false;
+    }
 
-    var global = window;
+    var global = global || window;
     
     var Notes = global.Notes = Notes || {
 	
@@ -50,7 +62,19 @@
 	_flatten : function (note) {		
 	    var ra = this._rearrangeNotes(note);
 	    return ra[11];
-	}		
+	},
+        
+        /**
+         * Will convert the note to a string appropriate 
+         * to be used as the value of an html attr or
+         * passed in the url
+         */
+        slugify: function (note) {
+            if (!inArray(note, this.names)) {
+                throw new Error("Invalid note " + note);
+            }
+            return note.toLowerCase().replace('#', '-sharp');
+        }
     };
 
     var Chord = global.Chord = Chord || {
@@ -208,16 +232,7 @@
 	    notes.push(open);
 	    //console.log(notes);
 	    fretmap.push(notes);				
-	}
-	
-	function inArray (needle, hay) {
-	    for(var i = 0; i < hay.length; i++) {
-		if(needle === hay[i]){
-		    return true;
-		}
-	    }
-	    return false;
-	}
+	}	
 	
 	return {
 	    
