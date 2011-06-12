@@ -1,7 +1,7 @@
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
    License: none (public domain)
-*/
+   */
 
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -16,36 +16,42 @@ article, aside, canvas, details, embed,
 figure, figcaption, footer, header, hgroup, 
 menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-size: 100%;
-	font: inherit;
-	vertical-align: baseline;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure, 
 footer, header, hgroup, menu, nav, section {
-	display: block;
+    display: block;
 }
 body {
-	line-height: 1;
+    line-height: 1;
 }
 ol, ul {
-	list-style: none;
+    list-style: none;
 }
 blockquote, q {
-	quotes: none;
+    quotes: none;
 }
 blockquote:before, blockquote:after,
 q:before, q:after {
-	content: '';
-	content: none;
+    content: '';
+    content: none;
 }
 table {
-	border-collapse: collapse;
-	border-spacing: 0;
+    border-collapse: collapse;
+    border-spacing: 0;
 }
+
+a {
+    text-decoration: none;    
+}
+
+a:hover { text-decoration: underline; }
 
 body {
     text-align: center;
@@ -69,7 +75,7 @@ body {
     padding:0px 2% 10px; 
     border:2px solid #000;
     text-align: left; 
-    background: #cccc99; 
+    background: #657b83; 
     min-height: 450px;
 }
 
@@ -87,22 +93,22 @@ body {
 
 #score-board ul li {
     float: left;
-    border-right: 1px solid #000;
-    border-bottom: 2px solid #000;
+    border-right: 1px solid #333;
+    border-bottom: 2px solid #333;
     width: 9%;
     height: 70px;
     overflow: hidden;    
     position: relative;
-    background: #333333;
+    background: #000;
 }
 
 #score-board ul li.leftmost {
-    border-left: 2px solid #000;    
+    border-left: 2px solid #333;    
 }
 
 #score-board ul li.rightmost {
     width: 11%;
-    border-right: 2px solid #000;    
+    border-right: 2px solid #333;    
 }
 
 #score-board ul li ul.chances {
@@ -117,22 +123,100 @@ body {
 #score-board ul li ul.chances li {
     width: 46%;
     height: 32px;
-    border-bottom: 1px solid #000;
-    border-left: 1px solid #000;
+    border-bottom: 1px solid #333;
+    border-left: 1px solid #333;
     border-right: 0px;
     float: right;
 }
 
 #left-side {
     float: left;
-    width: 56%;
+    width: 60%;
     height: 300px;
-    border-right: 2px solid #333;
+    border-right: 1px dashed #333;
+}
+
+#left-side #playground {
+    margin-top: 5px;
+    border: 2px solid #333;
+    width: 92%;
+    padding: 10px 2%;
+    height: 270px;
+    background: #fff;
+}
+
+#left-side #playground h2 {
+    font-size: 48px;
+    color: #666;
+    text-align: center;
+    padding: 20px;
+}
+
+#left-side #playground ul#notes {    
+    margin: 20px auto;
+    width: 90%;
+    height: 30px;
+}
+
+#left-side #playground ul#notes li {
+    margin-right: 12px;
+    float: left;
+    padding: 10px;
+    font-size: 18px;
+    width: 18px;
+    border: 1px solid #333;
+    text-align: center;
+    margin-bottom: 10px;
+    background: #FFF333;
+    cursor: pointer;
+}
+
+#left-side #playground #buttons {
+    clear: both;
+    width: 90%;
+    height: 40px;
+    text-align: center;
+    margin: 45px auto 20px;
+}
+
+#left-side #playground #buttons a {
+    margin-right: 20px;
+    cursor: pointer;
 }
 
 #right-side {
     float: right;
-    width: 42%;
+    width: 38%;
     height: 300px;
-    background: #000;
+}
+
+#right-side ul#chord-list {
+    float: left;
+    width: 25%;
+    margin: 5px 20px 5px 10px;
+    height: 290px;
+    border: 2px solid #333;
+    background: #fff;
+}
+
+#right-side ul#chord-list li {
+    padding: 5px;
+    border-bottom: 1px solid #eee;    
+}
+
+#right-side ul#chord-list li a.correct {
+    color: green;
+}
+
+#right-side ul#chord-list li a.wrong {
+    color: orange;
+}
+
+#right-side #answers {
+    width: 55%;
+    margin: 5px 20px 5px 10px;
+    height: 290px;
+    border: 2px solid #333;
+    background: #fff;
+    float: left;
 }

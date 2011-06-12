@@ -1,0 +1,11 @@
+Doc for the ten chord game
+--------------------------
+
+Spine Javascript MVC lib
+
+Models
+        Chord
+        will be stored in a collection implementation in which the 
+        next and the prev Chords can be accessed
+
+
