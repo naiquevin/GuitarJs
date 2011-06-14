@@ -7,7 +7,7 @@ jQuery(function($) {
     window.TenChordApp = Spine.Controller.create({
         el: $("#wrapper"),
 
-        proxied: ["renderNext"],
+        proxied: ["render"],
 
         events: {
             "click #next-btn": "next",
@@ -16,28 +16,51 @@ jQuery(function($) {
 
         elements: {
             "#score-board": "scoreboard",
-            "#question": "question"        
+            "#question": "question",
+            "#next-btn": "nextBtn",
+            "#prev-btn": "prevBtn"
         },
         
         init: function () {
             // create the note buttons
             NotePicker.init();
-            ChordModel.bind("create", this.renderNext);        
+            ChordModel.bind("create", this.render);        
             this.chord = OneChord.init();             
             // show the first chord right away
             this.newChord();
         },
 
+        /**
+         * next chord
+         * if next present show, else create new
+         */
         next: function () {
-            alert('hey');
-            if (this.chord.next === null) {
-                this.newChord();
+            var next = ChordModel.getNext(this.chord.current)
+            if (next) {
+                this.render(next);
                 return;
             } else {
-                
+                this.newChord();
             }            
         },
 
+        /**
+         * show the previous chord
+         * not present case is impossible. So defensively throw an Error
+         */
+        prev: function () {
+            var prev = ChordModel.getPrev(this.chord.current);
+            if (prev) {
+                this.render(prev);
+                return;
+            } else {
+                throw new Error('Previous chord not found?!');
+            }            
+        },
+
+        /**
+         * create a new chord by using the ChordModel's create method
+         */
         newChord : function () {
             var ch = ChordModel.getRandom(),
             last = ChordModel.last();
@@ -45,12 +68,31 @@ jQuery(function($) {
             ChordModel.create(ch);
         },
 
-        renderNext: function (chord) {
-            console.log(chord);
+        /**
+         * Render the chord on the screen
+         * @param ChordModel record
+         */
+        render: function (chord) {
             this.chord.change(chord);
+            this.updateButtons();
             return false;
-        }
+        },
 
+        /**
+         * if its the first chord, hide the prev button
+         * if its the last (10th) chord, hide the next button
+         */
+        updateButtons: function () {
+            var current_pk = this.chord.current.pk;
+            this.prevBtn.show();
+            this.nextBtn.show();
+            if (current_pk === 0) {
+                this.prevBtn.hide();
+            }
+            if (current_pk === 9) {
+                this.nextBtn.hide();
+            }
+        }
     });
 
     window.OneChord = Spine.Controller.create({
@@ -60,6 +102,9 @@ jQuery(function($) {
             
         },
 
+        /**
+         * Change the current chord
+         */
         change: function (item) {            
             this.current = item;
             this.render();
@@ -107,6 +152,5 @@ jQuery(function($) {
     });
 
     window.App = TenChordApp.init();
-
 
 });

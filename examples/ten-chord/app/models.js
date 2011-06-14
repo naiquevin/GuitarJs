@@ -28,9 +28,9 @@ ChordModel.extend({
      * @return ChordModel/boolean 
      * next if next record is found it is returned other wise return false
      */
-    getNext: function(pk) {
+    getNext: function(curr) {
         var next = this.select(function (chord) {
-            if (chord.pk === pk+1) return true;
+            if (chord.pk === curr.pk+1) return true;
         });
         if (next) {
             return next[0];
@@ -43,9 +43,9 @@ ChordModel.extend({
      * @return ChordModel/boolean 
      * prev if prev record is found it is returned other wise return false
      */
-    getPrev: function (pk) {
+    getPrev: function (curr) {
         var prev = this.select(function (chord) {
-            if (chord.pk === pk-1) return true;
+            if (chord.pk === curr.pk-1) return true;
         });
         if (prev) {
             return prev[0];
