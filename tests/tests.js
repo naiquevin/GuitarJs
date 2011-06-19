@@ -30,10 +30,22 @@ $(document).ready(function () {
         equals(Notes._flatten("F"), "E");
     });
 
+    test('Validate a note', function () {
+        ok(Notes._validate("E"), "E is fine");
+        ok(!Notes._validate("E#"), "But E# isn't");
+        ok(!Notes._validate("B#"), "Neither is B#");        
+    });
+
     test('Slugify a note', function() {
         equals(Notes.slugify("C#"), "c-sharp");
         equals(Notes.slugify("F"), "f");
         raises(Notes.slugify, Error, "Invalid Note B#");               
+    });
+
+    test('Unslugify a note', function() {
+        equals(Notes.unslugify("f-sharp"), "F#");
+        equals(Notes.unslugify("g"), "G");
+        raises(Notes.unslugify, Error, "Invalid Note e-sharp");               
     });
 
     module("Chord");

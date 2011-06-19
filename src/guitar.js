@@ -4,10 +4,9 @@
  * http://vineetnaik.me
  * @naiquevin
  * 
- * GuitarJS is a Javascript library for dealing with building blocks of music 
+ * GuitarJS is a Javascript library for making stuff that involves music theory
  * ie. notes, chords and scales particularly for a 6 string guitar 
  */
-
 
 /**
  *  variables accessible in global context
@@ -63,6 +62,15 @@
 	    var ra = this._rearrangeNotes(note);
 	    return ra[11];
 	},
+
+        /**
+         * To check if a note is valid
+         * @param String note, note to be checked
+         * @return boolean
+         */
+        _validate: function (note) {
+            return inArray(note, this.names);
+        },
         
         /**
          * Will convert the note to a string appropriate 
@@ -70,10 +78,23 @@
          * passed in the url
          */
         slugify: function (note) {
-            if (!inArray(note, this.names)) {
+            if (!this._validate(note)) {
                 throw new Error("Invalid note " + note);
             }
             return note.toLowerCase().replace('#', '-sharp');
+        },
+
+        /**
+         * @param String slug, the previously slugiffied string
+         * @return String note, the note
+         */
+        unslugify: function (slug) {
+            var note = slug.replace('-sharp', '#').toUpperCase();
+            if (!this._validate(note)) {
+                throw new Error("Invalid note " + note);
+            } else {
+                return note;
+            }
         }
     };
 
