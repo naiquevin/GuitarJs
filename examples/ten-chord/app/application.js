@@ -7,24 +7,28 @@ jQuery(function($) {
     window.TenChordApp = Spine.Controller.create({
         el: $("#wrapper"),
 
-        proxied: ["render"],
+        proxied: ["render", "confirmed"],
 
         events: {
             "click #next-btn": "next",
-            "click #prev-btn": "prev"
+            "click #prev-btn": "prev",
+            "click #confirm-guess": "confirm"
         },
 
         elements: {
             "#score-board": "scoreboard",
             "#question": "question",
             "#next-btn": "nextBtn",
-            "#prev-btn": "prevBtn"
+            "#prev-btn": "prevBtn",
+            "#confirm-guess": "confirmBtn",
+            "#buttons a": "controlButtons"
         },
         
         init: function () {
             // create the note buttons
-            NotePicker.init();
-            ChordModel.bind("create", this.render);        
+            this.notePicker = NotePicker.init();
+            ChordModel.bind("create", this.render);
+            ChordModel.bind("update", this.confirmed);            
             this.chord = OneChord.init();             
             // show the first chord right away
             this.newChord();
@@ -32,7 +36,7 @@ jQuery(function($) {
 
         /**
          * next chord
-         * if next present show, else create new
+         * if next present shown, else create new
          */
         next: function () {
             var next = ChordModel.getNext(this.chord.current)
@@ -65,6 +69,7 @@ jQuery(function($) {
             var ch = ChordModel.getRandom(),
             last = ChordModel.last();
             ch.pk = last ? last.pk + 1: 0;
+            ch.num_attempt = 0;
             ChordModel.create(ch);
         },
 
@@ -79,27 +84,80 @@ jQuery(function($) {
         },
 
         /**
+         * on click of the confirm button
+         * will be used to confirm the guess made by the user.
+         * will be used for both the attempts
+         */
+        confirm: function () {
+            var guess = this.notePicker.getMarked();
+            if (!guess[0]) {
+                alert("Please select some notes by clicking on them");
+                return;
+            }
+            this.chord.saveGuess(guess);
+        },
+
+        /**
+         * Will be called after a guess has been confirmed.
+         * Callback function of the update event of ChordModel
+         */
+        confirmed: function (chord) {
+            switch (chord.num_attempt) {
+            case 2:
+                // no more guesses allowed for this chord
+                console.log("both guesses consumed");
+                break;
+            case 1:
+                // 1 more guess to go
+                console.log("1 more guess to go");
+                break;
+            case 0:
+            default:
+                return;                
+            }
+            this.updateButtons();
+        },
+
+        /**
          * if its the first chord, hide the prev button
          * if its the last (10th) chord, hide the next button
          */
         updateButtons: function () {
-            var current_pk = this.chord.current.pk;
-            this.prevBtn.show();
-            this.nextBtn.show();
+            var current_pk = this.chord.current.pk,
+            current_num_attempt = this.chord.current.num_attempt,
+            buttons = [
+                { el: this.prevBtn, status: true },
+                { el: this.nextBtn, status: true },
+                { el: this.confirmBtn, status: true }                  
+            ];
+            this.controlButtons.show();
+            // if first chord hide prev
             if (current_pk === 0) {
-                this.prevBtn.hide();
+                buttons[0]['status'] = false;
             }
-            if (current_pk === 9) {
-                this.nextBtn.hide();
+            // if last chord or current chord not answered yet, hide next
+            if (current_pk === 9 || current_num_attempt < 2) {
+                buttons[1]['status'] = false;
             }
+            // if no note button pressed, hide confirm
+            // var guess = this.notePicker.getMarked();
+            // if (!guess[0]) {
+            //     buttons[2]['status'] = false;
+            // }
+            for (var i in buttons) {
+                if (!buttons[i]['status']) {
+                    var el = buttons[i]['el'];
+                    el.hide();
+                }
+            }            
         }
     });
 
     window.OneChord = Spine.Controller.create({
-        el: $("h2#question"),
+        el: $("h2#question"),        
 
         init: function () {
-            
+
         },
 
         /**
@@ -114,8 +172,10 @@ jQuery(function($) {
             this.el.text(this.current.name);
         },
 
-        confirmAnswer: function () {
-            
+        saveGuess: function (guess) {
+            this.current.num_attempt++;
+            this.current.answer = guess;
+            this.current.save();            
         }        
     });
 
@@ -125,6 +185,12 @@ jQuery(function($) {
         elements: {
             "#notes li": "button"
         },
+
+        events: {
+            "click #notes li": "toggleMark"
+        },
+
+        proxies: ["mark"],
 
         init: function () {
             this.render();
@@ -141,12 +207,27 @@ jQuery(function($) {
         },
 
         /**
+         * Will mark and unmark the clicked note
+         */
+        toggleMark: function (event) {            
+            $(event.target).toggleClass("marked-note");
+        },
+
+        /**
          * Will clear the selected notes
          */
         clear: function () {
             this.el.children().each(function () {
                 $(this).removeClass("marked-note");
             });
+        },
+
+        getMarked: function () {
+            var marked = [];
+            this.el.children().filter(".marked-note").each(function () {
+                marked.push(Notes.unslugify($(this).attr('id')));
+            });
+            return marked;
         }
         
     });

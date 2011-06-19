@@ -171,6 +171,10 @@ body {
     cursor: pointer;
 }
 
+#left-side #playground ul#notes li.marked-note {
+    background: #ff0000;
+}
+
 #left-side #playground #buttons {
     clear: both;
     width: 90%;
