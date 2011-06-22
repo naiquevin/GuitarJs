@@ -10,7 +10,11 @@
     <script src="../../lib/spine.js" type="text/javascript" charset="utf-8"></script>
     <script src="app/application.js" type="text/javascript"></script>
     <script src="app/models.js" type="text/javascript"></script>
-
+    <script type="text/x-jquery-tmpl" id="chordlistTemplate">
+      <li id="pk-${pk}" class="active">
+        <a class="{{if correct}}correct{{/if}}">${name}</a>
+      </li>
+    </script>
   </head>
   <body>
     <div id="header">
@@ -49,10 +53,7 @@
         </div>
       </div>
       <div id="right-side">
-        <ul id="chord-list">
-          <li><a class="correct" href="#">A Min</a></li>
-          <li><a class="wrong" href="#">D# Dim</a></li>
-        </ul>
+        <ul id="chord-list"></ul>
         <div id="answers">
 
         </div>

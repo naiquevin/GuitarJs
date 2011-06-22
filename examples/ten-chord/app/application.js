@@ -80,6 +80,7 @@ jQuery(function($) {
         render: function (chord) {
             this.chord.change(chord);
             this.updateButtons();
+            this.notePicker.change(chord);
             return false;
         },
 
@@ -169,7 +170,16 @@ jQuery(function($) {
         },
 
         render: function () {
-            this.el.text(this.current.name);
+            this.el.text(this.current.name);            
+            var $list = $("#chord-list");
+            $list.children().removeClass('active');
+            // append to the chord list if its a new chord
+            if (!$("#pk-"+this.current.pk).length) {
+                var elements = $("#chordlistTemplate").tmpl(this.current);            
+                $list.append(elements[0]);
+            } else {
+                $("#pk-"+this.current.pk).addClass('active');
+            }
         },
 
         saveGuess: function (guess) {
@@ -214,12 +224,29 @@ jQuery(function($) {
         },
 
         /**
-         * Will clear the selected notes
+         * Will clear all the selected notes
          */
         clear: function () {
             this.el.children().each(function () {
                 $(this).removeClass("marked-note");
             });
+        },
+
+        /**
+         * When a chord is changed, the buttons will be 
+         * marked/unmarked accordingly
+         */
+        change: function (chord) {
+            this.clear();
+            if (chord.answer) {
+                for (var i = 0; i < chord.answer.length; i++) {
+                    this.mark(chord.answer[i]);
+                }
+            }
+        },
+
+        mark: function (name) {
+            $("#"+Notes.slugify(name)).addClass("marked-note");
         },
 
         getMarked: function () {

@@ -208,6 +208,10 @@ body {
     border-bottom: 1px solid #eee;    
 }
 
+#right-side ul#chord-list li.active {
+    background: #fff333;
+}
+
 #right-side ul#chord-list li a.correct {
     color: green;
 }
