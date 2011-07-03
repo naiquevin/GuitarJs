@@ -27,6 +27,7 @@ jQuery(function($) {
         init: function () {
             // create the note buttons
             this.notePicker = NotePicker.init();
+            this.scoreboard = Scoreboard.init();
             ChordModel.bind("create", this.render);
             ChordModel.bind("update", this.confirmed);            
             this.chord = OneChord.init();             
@@ -85,12 +86,12 @@ jQuery(function($) {
         },
 
         /**
-         * on click of the confirm button
+         * on click of the confirm/roll button
          * will be used to confirm the guess made by the user.
-         * will be used for both the attempts
+         * ..for both the attempts
          */
         confirm: function () {
-            var guess = this.notePicker.getMarked();
+            var guess = this.notePicker.getMarked("guessed");
             if (!guess[0]) {
                 alert("Please select some notes by clicking on them");
                 return;
@@ -103,6 +104,7 @@ jQuery(function($) {
          * Callback function of the update event of ChordModel
          */
         confirmed: function (chord) {
+            //this.scoreboard.update(score);
             switch (chord.num_attempt) {
             case 2:
                 // no more guesses allowed for this chord
@@ -140,11 +142,6 @@ jQuery(function($) {
             if (current_pk === 9 || current_num_attempt < 2) {
                 buttons[1]['status'] = false;
             }
-            // if no note button pressed, hide confirm
-            // var guess = this.notePicker.getMarked();
-            // if (!guess[0]) {
-            //     buttons[2]['status'] = false;
-            // }
             for (var i in buttons) {
                 if (!buttons[i]['status']) {
                     var el = buttons[i]['el'];
@@ -184,9 +181,41 @@ jQuery(function($) {
 
         saveGuess: function (guess) {
             this.current.num_attempt++;
-            this.current.answer = guess;
-            this.current.save();            
-        }        
+            this.current.guess = guess;
+            var result = this.evaluateGuess(guess);
+            this.current.correct = result.correct;
+            if (this.current.score_id) {
+                var score = ScoreModel.find(this.current.score_id);
+                score.scores.push(result.score);
+            } else {
+                var score = ScoreModel.create({ scores: [result.score]});
+            }
+            score.save();
+            this.current.score_id = score.id;
+            this.current.save();    
+        },
+
+        /**
+         * Evaluate the guess and find out the correctly guessed notes
+         * and calculate the points
+         * @return object {correct: [], score: int}
+         */
+        evaluateGuess: function (guess) {
+            var notes = this.current.notes,
+            correct = [];
+            // console.log(notes, guess);
+            for (var i = 0; i < guess.length; i++) {
+                // safe to use jQuery.inArray here
+                if ($.inArray(guess[i], notes) !== -1) {
+                    correct.push(guess[i]);
+                }
+            }
+            return {
+                correct: correct,
+                score: Math.round(correct.length/notes.length * 10)
+            };
+        }
+
     });
 
     window.NotePicker = Spine.Controller.create({
@@ -197,13 +226,22 @@ jQuery(function($) {
         },
 
         events: {
-            "click #notes li": "toggleMark"
+            "click #notes li": "toggleGuess"
         },
 
-        proxies: ["mark"],
+        proxied: ["toggleGuess", "onGuess"],
+
+        currentChord: null,
+
+        NOTE_STATUS: {
+            guessed: "guessed-note",
+            correct: "correct-note",
+            incorrect: "incorrect_note"
+        },
 
         init: function () {
             this.render();
+            ScoreModel.bind("update", this.onGuess);
         },
 
         render: function () {
@@ -217,18 +255,19 @@ jQuery(function($) {
         },
 
         /**
-         * Will mark and unmark the clicked note
+         * Will mark and unmark the clicked note as guessed note
          */
-        toggleMark: function (event) {            
-            $(event.target).toggleClass("marked-note");
+        toggleGuess: function (event) {
+            $(event.target).toggleClass(this.NOTE_STATUS.guessed);
         },
 
         /**
-         * Will clear all the selected notes
+         * Will clear all the guessed notes
          */
         clear: function () {
+            var class_attr = this.NOTE_STATUS.guessed;
             this.el.children().each(function () {
-                $(this).removeClass("marked-note");
+                $(this).removeClass(class_attr);
             });
         },
 
@@ -236,27 +275,79 @@ jQuery(function($) {
          * When a chord is changed, the buttons will be 
          * marked/unmarked accordingly
          */
-        change: function (chord) {
+        change: function (chord) {            
             this.clear();
-            if (chord.answer) {
-                for (var i = 0; i < chord.answer.length; i++) {
-                    this.mark(chord.answer[i]);
+            this.currentChord = chord;
+            if (chord.guess) {
+                for (var i = 0; i < chord.guess.length; i++) {
+                    this.mark(chord.guess[i], "guessed");
                 }
             }
         },
 
-        mark: function (name) {
-            $("#"+Notes.slugify(name)).addClass("marked-note");
+        /**
+         * after the user makes a guess, this method will be 
+         * called as a callback of update event of the 
+         * ScoreModel object
+         * Depending upon the correctness of the guesses, the 
+         * notes will be highlighted
+         */
+        onGuess: function (score) {
+            console.log(this.currentChord);
         },
 
-        getMarked: function () {
-            var marked = [];
-            this.el.children().filter(".marked-note").each(function () {
+        /**
+         * will mark the note as guessed by the user
+         * @param name - string - name of the note to be marked
+         * @param status - string - status it is to be marked as 
+         */
+        mark: function (name, status) {
+            var class_attr = this.NOTE_STATUS[status];
+            $("#"+Notes.slugify(name)).addClass(class_attr);
+        },
+
+        getMarked: function (status) {
+            var marked = [],
+            class_attr = this.NOTE_STATUS[status];
+            this.el.children().filter("."+class_attr).each(function () {
                 marked.push(Notes.unslugify($(this).attr('id')));
             });
             return marked;
+        }        
+    });
+
+    window.Scoreboard = Spine.Controller.create({
+        el: $("#score-board>ul"),
+
+        init: function () {
+            this.render();
+        },
+
+        render: function () {
+            var html = '';
+            for (var j = 0; j < 10; j++) {
+                if (j === 0) {
+                    html += '<li class="leftmost">';                    
+                } else if (j === 9) {
+                    html += '<li class="rightmost">'
+                } else {
+                    html += '<li>';
+                }
+                html += '<ul class="chances">';
+                var k = j === 9 ? 3 : 2;
+                for (var i = 0; i < k; i++) {
+                    html += '<li></li>';
+                }
+                html += '</ul>';
+                html += '<div></div>';
+                html += '</li>';
+            }
+            this.el.append(html);
+        },
+
+        update: function (score) {
+            alert('hey');
         }
-        
     });
 
     window.App = TenChordApp.init();

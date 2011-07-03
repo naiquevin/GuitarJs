@@ -5,19 +5,23 @@
  * pk - int - primary key (starts at 0)
  * name - string - name of the chord
  * notes - array - notes in the chord
- * answer - array - notes guessed by the user
- * correct - boolean - whether its correctly answered
+ * guess - array - notes guessed by the user
+ * correct - array - most recent guess by the user
  * num_attempt - int - start with 0, 1, 2 is max
+ * score_id - id reference of the ScoreModel Object stored in memory
  */
 
 var ChordModel = Spine.Model.setup("ChordModel", 
                                    ["pk", 
                                     "name", 
                                     "notes", 
-                                    "answer", 
+                                    "guess", 
                                     "correct", 
-                                    "num_attempt"]
+                                    "num_attempt",
+                                    "score_id"
+                                   ]
                                   );
+
 
 // Class Properties
 ChordModel.extend({
@@ -62,3 +66,5 @@ ChordModel.extend({
         }
     }
 });
+
+var ScoreModel = Spine.Model.setup("ScoreModel", ["scores"]);

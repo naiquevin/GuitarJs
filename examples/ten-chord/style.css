@@ -2,7 +2,6 @@
    v2.0 | 20110126
    License: none (public domain)
    */
-
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -100,6 +99,8 @@ body {
     overflow: hidden;    
     position: relative;
     background: #000;
+    font-size: 18px;
+    color: #ff0000;
 }
 
 #score-board ul li.leftmost {
@@ -107,7 +108,7 @@ body {
 }
 
 #score-board ul li.rightmost {
-    width: 11%;
+    width: 13%;
     border-right: 2px solid #333;    
 }
 
@@ -122,11 +123,26 @@ body {
 
 #score-board ul li ul.chances li {
     width: 46%;
-    height: 32px;
+    height: 20px;
+    padding: 5px 0;
     border-bottom: 1px solid #333;
     border-left: 1px solid #333;
     border-right: 0px;
-    float: right;
+    float: right;    
+}
+
+#score-board ul li.rightmost ul.chances li { 
+    width: 32%;
+}
+
+#score-board ul li div {
+    clear: both;
+    position: absolute;
+    top: 45px;
+    left: 30px;
+    font-weight: bold;
+    font-size: 18px;
+    color: #728a05;
 }
 
 #left-side {
@@ -171,7 +187,7 @@ body {
     cursor: pointer;
 }
 
-#left-side #playground ul#notes li.marked-note {
+#left-side #playground ul#notes li.guessed-note {
     background: #ff0000;
 }
 
