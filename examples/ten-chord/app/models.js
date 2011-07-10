@@ -67,4 +67,31 @@ ChordModel.extend({
     }
 });
 
-var ScoreModel = Spine.Model.setup("ScoreModel", ["scores"]);
+var ScoreModel = Spine.Model.setup("ScoreModel", ["chord_pk", "scores", "total"]);
+
+// Class Properties
+ScoreModel.extend({
+
+    /**
+     * Method to compute the score after each roll
+     * @param ScoreModel object so far for the current frame
+     * @return int score for this roll
+     */
+    getRollScore: function (score) {
+        var scores = score.scores;
+        if (scores.length === 2) {
+            return scores[1] - scores[0];
+        } else if (scores.length === 1) {
+            return scores[0];
+        }
+    },
+
+    /**
+     * Method to compute the total score for each frame so far
+     * @param ScoreModel Object score for the frame
+     * @return int total score for the frame so far
+     */
+    getTotalScore: function (score) {
+        return score.scores[score.scores.length - 1];
+    }
+});

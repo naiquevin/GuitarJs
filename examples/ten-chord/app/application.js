@@ -104,7 +104,8 @@ jQuery(function($) {
          * Callback function of the update event of ChordModel
          */
         confirmed: function (chord) {
-            //this.scoreboard.update(score);
+            var score = ScoreModel.find(chord.score_id);
+            this.scoreboard.update(score);
             switch (chord.num_attempt) {
             case 2:
                 // no more guesses allowed for this chord
@@ -190,6 +191,8 @@ jQuery(function($) {
             } else {
                 var score = ScoreModel.create({ scores: [result.score]});
             }
+            score.total = ScoreModel.getTotalScore(score);
+            score.chord_pk = this.current.pk;            
             score.save();
             this.current.score_id = score.id;
             this.current.save();    
@@ -293,7 +296,7 @@ jQuery(function($) {
          * notes will be highlighted
          */
         onGuess: function (score) {
-            console.log(this.currentChord);
+            // console.log(this.currentChord);
         },
 
         /**
@@ -319,8 +322,11 @@ jQuery(function($) {
     window.Scoreboard = Spine.Controller.create({
         el: $("#score-board>ul"),
 
+        proxied: ["scoreChanged"],
+
         init: function () {
             this.render();
+            ScoreModel.bind('change', this.scoreChanged);
         },
 
         render: function () {
@@ -345,9 +351,46 @@ jQuery(function($) {
             this.el.append(html);
         },
 
+        scoreChanged: function (event, score) {
+            this._getScoreCard(score.chord_pk).children().filter('div').text(score.total);
+        },
+
+        /**
+         * @param ScoreModel score associated with the chord
+         */
         update: function (score) {
-            alert('hey');
+            var scores = score.scores,
+            attempt = scores.length,
+            // total possible attempts
+            total_attempts = score.chord_pk === 9 ? 3 : 2,
+            box_index = this._getRollScoreBox(attempt, total_attempts),
+            box = this._getScoreCard(score.chord_pk).children().filter('ul.chances').children().eq(box_index),
+            // score for this roll only
+            roll_score = ScoreModel.getRollScore(score);
+            box.text(roll_score);
+        },
+
+        /**
+         * Get the correct li index to show the score for this roll
+         * This is computed using the attempt number and total possible
+         * Method can be avoided if float: left used instead of float: right
+         * @param int attempt the number of attempt [1,2,3]
+         * @param int total_attempts total possible attempts (3 in case of last frame)
+         * @return int index of the li element 
+         */
+        _getRollScoreBox: function (attempt, total_attempts) {
+            return Math.abs(attempt - total_attempts);
+        },
+        
+        /**
+         * Get the score card (block) for the current frame
+         * @param int chord_pk primary key of the current chord
+         * @return jQuery Object 
+         */
+        _getScoreCard: function (chord_pk) {
+            return this.el.children().eq(chord_pk);
         }
+            
     });
 
     window.App = TenChordApp.init();
