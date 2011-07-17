@@ -4,8 +4,10 @@
  * http://vineetnaik.me
  * @naiquevin
  * 
- * GuitarJS is a Javascript library for making stuff that involves music theory
- * ie. notes, chords and scales particularly for a 6 string guitar 
+ * GuitarJS is a small library for playing with basic music theory
+ * related stuff in javascript 
+ * such as notes, chords and scales and extended for a 6 string guitar
+ * for finding all possible voicings of a chord.
  */
 
 /**
