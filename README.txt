@@ -5,6 +5,9 @@ basic music related stuff in javascript, such as
 notes, chords, scales and extended for a 6 string guitar
 for getting all possible voicings of a chord
 
+Currently it only supports Major, Minor, Diminished and Augmented.
+Feel free to fork and add new types if you can.
+
 Basic Usage
 -----------
 
