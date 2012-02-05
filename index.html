@@ -3,30 +3,36 @@
 <head>
   <meta charset='utf-8'>
 
-  <title>naiquevin/GuitarJs @ GitHub</title>
+  <title>naiquevin/GuitarJs @ GitHub</title>  
+
+  <script type="text/javascript" src="guitar.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 
   <style type="text/css">
     body {
       margin-top: 1.0em;
-      background-color: #285331;
+      background-color: #234F32;
       font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #ffffff;
+      color: #FFC757;
     }
     #container {
       margin: 0 auto;
       width: 700px;
     }
-    h1 { font-size: 3.8em; color: #d7acce; margin-bottom: 3px; }
+    h1 { font-size: 3.8em; color: #fff; margin-bottom: 3px; }
     h1 .small { font-size: 0.4em; }
     h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #d7acce; }
-    h3 { text-align: center; color: #d7acce; }
-    a { color: #d7acce; }
+    h2 { font-size: 1.5em; color: #fff; }
+    h3 { text-align: left; color: #fff; }
+    a { color: #8FC945; }
     .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
     .download { float: right; }
     pre { background: #000; color: #fff; padding: 15px;}
     hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
     .footer { text-align:center; padding-top:30px; font-style: italic; }
+    
+    p.result { color: #fff; background: #000; }
+
   </style>
 </head>
 
@@ -49,23 +55,48 @@
       A small javascript library for guitar notes, scales, chords
     </div>
 
-    
+    <h2>Usage</h2>
 
+    <ul>
+      <li>
+        <h3>Build a chord</h3>
+        <cite>Chord.build("A Maj")</cite>
+        <a class="try" href="javascript:void(0);">Try</a>
+        <a class="toggle" href="javascript:void(0);">Toggle Result</a>
+        <br />
+        <p class="result"></p>
+      </li>
+      <li>
+        <h3>Get the entire fretboard map (Applies to 6 string 24 fret std. tuned guitar.)</h3>
+        <cite>Guitar.Fretboard.fretMap</cite>
+        <a class="try" href="javascript:void(0);">Try</a>
+        <a class="toggle" href="javascript:void(0);">Toggle Result</a>
+        <br />
+        <p class="result"></p>
+      </li>
+      <li>
+        <h3>Find all occurences of a note</h3>
+        <cite>Guitar.Fretboard.findOccurrences("A")</cite>
+        <a class="try" href="javascript:void(0);">Try</a>
+        <a class="toggle" href="javascript:void(0);">Toggle Result</a>
+        <br />
+        <p class="result"></p>
+      </li>
+      <li>
+        <h3>All the chord shapes on a guitar fretboard.</h3>
+        <cite>var ch = Guitar.Fretboard.create("F# Min")</cite>
+        <a id="try-chord" href="javascript:void(0);">Try</a>
+        <a id="next-shape" href="javascript:void(0);">Next Shape</a>
+        <br />
+        <p class="result"></p>
+      </li>
+    </ul>
     
-
+    <h2>Authors</h2>
+    <p>Vineet (naikvin@gmail.com)<br/></p>
     
-
-    
-
-    
-      <h2>Authors</h2>
-      <p>Vineet (naikvin@gmail.com)<br/>      </p>
-    
-
-    
-      <h2>Contact</h2>
-      <p>Vineet Naik (naikvin@gmail.com)<br/>      </p>
-    
+    <h2>Contact</h2>
+    <p>Vineet Naik (naikvin@gmail.com)<br/></p>    
 
     <h2>Download</h2>
     <p>
@@ -74,8 +105,8 @@
       <a href="https://github.com/naiquevin/GuitarJs/tarball/master">tar formats.
     </p>
     <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/naiquevin/GuitarJs</pre>
+    by running:
+    <pre>$ git clone git://github.com/naiquevin/GuitarJs</pre>
     </p>
 
     <div class="footer">
@@ -83,6 +114,55 @@
     </div>
 
   </div>
-
+<script type="text/javascript">
+    $(document).ready(function () {
+    	$("ul>li>a.try").click(function () {
+    	    var $siblings = $(this).siblings(),
+    	    $cite = $siblings.filter("cite"),
+    	    $result_area = $siblings.filter("p.result");        
+    	    if ($result_area.children().filter("dl").length > 0) {
+    	        $result_area.show();
+    	        return false;
+    	    }
+    	    result = eval($cite.text());
+    	    var html = show_object(result);
+    	    $result_area.html(html).css('padding', '10px');
+    	});
+    	
+    	$("ul>li>a.toggle").click(function () {
+    	    $(this).siblings().filter("p.result").toggle();
+    	});
+    	
+    	function show_object(obj) {
+    	    var html = '<dl>';
+    	    for (var i in obj) {            
+    	        html += '<dt>'+i+':</dt>';
+    	        html += '<dd>'+obj[i]+'</dd>';            
+    	    }
+    	    html += '</dl>';
+    	    return html;
+    	}
+    	
+    	(function () {
+    	    var ch = Guitar.Chord.create("F# Min");
+    	    var cs = ch.next();
+    	    var html = show_object(cs);
+    	
+    	    $("#try-chord").click(function () {
+    	        $(this).siblings().filter("p").html(html).css('padding', '10px');
+    	    });
+    	
+    	    $("#next-shape").click(function () {            
+    	        if (ch.has_next()) {
+    	            cs = ch.next();
+    	            html = show_object(cs);
+    	            $("#try-chord").trigger('click');
+    	        } else {
+    	            alert('upto 24 frets only!');
+    	        }
+    	    });
+    	}) ();    
+    });
+</script>
 </body>
 </html>
